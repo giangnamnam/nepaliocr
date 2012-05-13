@@ -185,8 +185,10 @@ namespace OCR
 					index = tempStr->IndexOf(" ");
 					charStr = tempStr->Substring(0,index);
 					unicodeStr = tempStr->Substring(index+1);
-					slForCharacters->Add(charStr,unicodeStr);
-					this->characterBox->Items->Add(charStr);
+					if(!slForCharacters->ContainsKey(charStr)){
+						slForCharacters->Add(charStr,unicodeStr);
+						this->characterBox->Items->Add(charStr);
+					}
 					tempStr = sr->ReadLine();
 				}
 				sr->Close();

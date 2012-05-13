@@ -1594,7 +1594,8 @@ private: System::Windows::Forms::MenuItem *  mnuRemoveNoiseII;
 					index = tempStr->IndexOf(" ");
 					charStr = tempStr->Substring(0,index);
 					unicodeStr = tempStr->Substring(index+1);
-					slForCharacters->Add(charStr,unicodeStr);
+					if(!slForCharacters->ContainsKey(charStr))
+					{slForCharacters->Add(charStr,unicodeStr);}
 					tempStr = sr->ReadLine();
 				}
 				sr->Close();
