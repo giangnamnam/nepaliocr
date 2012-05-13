@@ -52,7 +52,7 @@
 #include "about.h"
 #include "helpLoadImage.h"
 #include "helpOCR.h"
- 
+
 
 
 #pragma once
@@ -68,6 +68,7 @@ namespace OCR
 	using namespace System::Windows::Forms;
 	using namespace System::ComponentModel;
 	using namespace System::Drawing::Imaging;
+	using namespace System::Threading;
  
 
 	/// <summary> 
@@ -189,8 +190,9 @@ namespace OCR
 			 String* scriptFilePath;
 			 String* characterDBPath;
 
+	private: Thread __gc *ocrSampleThread;	
 	
-	private: System::Collections::SortedList* slForCharacters;
+private: System::Collections::SortedList* slForCharacters;
 	private: System::Collections::SortedList* slModelTranscription;	// for storing the model transcriptions
 	private: System::Collections::ArrayList* alModelRec;			// for models that already recognized
 			 //System::Collections::ArrayList *aakarList;
@@ -1703,7 +1705,7 @@ private: System::Windows::Forms::MenuItem *  mnuRemoveNoiseII;
 				this->callPostProcessor(text);
 			}
 			catch(System::Exception *ex){
-				System::Windows::Forms::MessageBox::Show("Garbled Output","I am sorry, the PostProcessor failed, \nit seems like you don't have postprocessor or it cannot be run");
+				System::Windows::Forms::MessageBox::Show("Garbled Output","The Post Processor which checks for errors has failed, \nIt seems that the postprocessor was not found or the postprocessor cannot be run");
 				this->statusBar1->Text = "PostProcessor Failed";
 				this->rtbMainOutput->Text = text;
 			}
@@ -2088,33 +2090,34 @@ private: System::Void mnuSaveImage_Click(System::Object *  sender, System::Event
 private: System::Void mnuFastRecognize_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
 			 
-			 if(this->ImageLoaded==true){
-				 
-				//contrast
-				this->Contrast(10);
-				this->ContrastDone=true;
-				this->Update();
-				
-				//mean removal
-				//this->MeanRemoval(9);
-				//this->meanDone= true;
-				this->Update();
+			 //if(this->ImageLoaded==true){
+				// 
+				////contrast
+				//this->Contrast(10);
+				//this->ContrastDone=true;
+				//this->Update();
+				//
+				////mean removal
+				////this->MeanRemoval(9);
+				////this->meanDone= true;
+				//this->Update();
 
-				//Binarization
-				this->makeBinary();
-				
-				//separation
-				this->separate();
+				////Binarization
+				//this->makeBinary();
+				//
+				////separation
+				//this->separate();
 
-				//Recognition
-				 this->Recognize();
+				////Recognition
+				// this->Recognize();
 
 
-			 }
-			 else{
-				 System::Windows::Forms::MessageBox::Show("Please load the image first","Image not loaded");
+			 //}
+			 //else{
+				// System::Windows::Forms::MessageBox::Show("Please load the image first","Image not loaded");
 
-			 }
+			 //}
+			 this->DoOCR();
 
 		 }
 
@@ -2125,7 +2128,17 @@ private: System::Void mnuExit_Click(System::Object *  sender, System::EventArgs 
 
 private: System::Void mnuFastRecognize2_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
-			 {
+			 this->DoOCR();
+			 //this->DoOCRThreaded();
+		 }
+
+		private : System::Void DoOCR(){
+			 ocrSampleThread = __gc new Thread(__gc new ThreadStart(this,OCRThreadProcess));			 
+			 ocrSampleThread->Start();
+			}
+
+		 private : System::Void OCRThreadProcess(){
+				   
 			 if(this->ImageLoaded==true){
 				 
 				//contrast
@@ -2152,10 +2165,9 @@ private: System::Void mnuFastRecognize2_Click(System::Object *  sender, System::
 			 else{
 				 System::Windows::Forms::MessageBox::Show("Please load the image first","Image not loaded");
 
-			 }
+			 }		 
+			}
 
-		 }
-		 }
 private: System::Void mnuRecognize_Click(System::Object *  sender, System::EventArgs *  e)
 		{
 			 if(this->ImageLoaded){
