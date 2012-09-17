@@ -2124,7 +2124,7 @@ void PrintStdOpts(char *opt)
  * Service Pack 3  
  * Intel[R] 
  * Pentium 4 CPU  2.80 GHZ 
- * 2.80 GHZ , 1.00 GB of  RAM 
+ * Intel Core I3 2.2 GHZ 4 CPUs
  *
  *
  * Requirements:
